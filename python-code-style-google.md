@@ -1,4 +1,3 @@
-本人摘自[runoob.com](http://www.runoob.com/w3cnote/google-python-styleguide.html)
 
 Python风格规范(Google)，Google官方英文版，请参考[Google Style Guide](https://google.github.io/styleguide/pyguide.html)
 以下代码中**Yes**表示推荐，**No**表示不推荐
