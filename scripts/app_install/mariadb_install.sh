@@ -7,6 +7,7 @@ if [ $1 -eq 0 ];then
   apt-get -y install cmake bison g++ build-essential libncurses5-dev make libjemalloc-dev gnutls-dev
 fi
 
+# mariadb releases: https://downloads.mariadb.org/mariadb/+releases/
 base="data2"
 source_dir="/root/mariadb-10.2.15"
 port=3308
