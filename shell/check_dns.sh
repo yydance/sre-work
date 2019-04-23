@@ -3,27 +3,27 @@
 # curl检查超时时间超过1s换下一个DNS，检查文件中所有仍超过1s，告警通知
 # 预设定脚本每隔3分钟执行一次
 #
-HOSTNAME=`grep "^id:" /etc/salt/minion |awk '{print $2}'`
+HOSTNAME=$(grep "^id:" /etc/salt/minion |awk '{print $2}')
 FDNS="/etc/resolv.conf"
-LOGDIR=$(cd `dirname $0`;pwd)
+LOGDIR=$(cd $(dirname $0);pwd)
 
 script_name="${0##*/}"
 cron_file="/var/spool/cron/root"
 
 FREX="([0-9]{1,3}[\.]){3}[0-9]{1,3}"
-NUMS=`grep -v "^#" $FDNS |awk '{print $2}' |egrep $FREX|wc -l`
+NUMS=$(grep -v "^#" $FDNS |awk '{print $2}' |egrep $FREX|wc -l)
 
-NETWORK=`ip a|grep UP|grep -v DOWN|grep -v 'lo:'|awk '{print $2}'|cut -d':' -f1`
-IP=`ip a|grep "$NETWORK"|tail -1|cut -d'/' -f1|awk '{print $2}'`
+NETWORK=$(ip a|grep UP|grep -v DOWN|grep -v 'lo:'|awk '{print $2}'|cut -d':' -f1)
+IP=$(ip a|grep "$NETWORK"|tail -1|cut -d'/' -f1|awk '{print $2}')
 #
 
 # check whether command "bc" is exist or not
-result=`which bc 2>/dev/null`
+result=$(which bc 2>/dev/null)
 if [[ "$result" = "" ]];then
 yum -y install bc
 fi
 # dig command is provided by "bind-utils"
-if [[ "`which dig 2>/dev/null`" = "" ]];then
+if [[ "$(which dig 2>/dev/null)" = "" ]];then
 yum -y install bind-utils
 fi
 #
@@ -33,7 +33,7 @@ cron_path(){
   PATHRESULT=$(crontab -l|grep -o PATH)
   if [[ "$PATHRESULT" = "" ]];then
     PATH=$(echo $PATH)
-    sed -i "1 i\PATH=$PATH" /var/spool/cron/root
+    sed -i "1 i\PATH=$PATH" $cron_file
     /etc/init.d/crond restart
   fi
 }
@@ -91,7 +91,7 @@ DATE="date +%Y%m%d-%H:%M:%S"
 # 判断公共DNS是否可用
 valid_dns(){
   for PDNS in $PUBLICDNS;do
-    RESULT=`dig @$PDNS ${FURL#*//} |grep status|awk '{print $6}'|cut -d, -f1`
+    RESULT=$(dig @$PDNS ${FURL#*//} |grep status|awk '{print $6}'|cut -d, -f1)
     if [[ "$RESULT" = "NOERROR" ]];then
       sed -i "1 i\nameserver $PDNS" $FDNS
       exit 0
@@ -105,31 +105,31 @@ for FURL in $FURLS;do
 NUM=1
   while [ $NUM -le $NUMS ]
   do
-    DNS=`grep -v "^#" $FDNS|awk '{print $2}'  |egrep $FREX|head -1`
-    RESULT=`dig @$DNS ${FURL#*//} |grep status|awk '{print $6}'|cut -d, -f1`
+    DNS=$(grep -v "^#" $FDNS|awk '{print $2}'  |egrep $FREX|head -1)
+    RESULT=$(dig @$DNS ${FURL#*//} |grep status|awk '{print $6}'|cut -d, -f1)
     if [[ "$RESULT" = "NOERROR" ]];then
       FTIME=`curl $OPTS $FURL`
-      if [ `echo "$FTIME<$TIMEOUT"|bc` -eq 1 ];then
+      if [ $(echo "$FTIME<$TIMEOUT"|bc) -eq 1 ];then
         break
       else
         if [ $NUM -ne $NUMS ];then
-          logit "* `$DATE`:retry $NUM time,$FURL $DNS timeout: $FTIME"
+          logit "* $($DATE):retry $NUM time,$FURL $DNS timeout: $FTIME"
           change_dns
           sleep 1
         else
-          logit "* `$DATE`:retry $NUM time,$FURL $DNS timeout: $FTIME"
-          logit "* `$DATE`: $FURL all dns server time more than $TIMEOUT"
+          logit "* $($DATE):retry $NUM time,$FURL $DNS timeout: $FTIME"
+          logit "* $($DATE): $FURL all dns server time more than $TIMEOUT"
       #    alerted "dns timeout:$HOSTNAME" "dns timeout:$HOSTNAME-$IP"
           exit 1
         fi
       fi
     else
       if [ $NUM -ne $NUMS ];then
-        logit "* `$DATE`:retry $NUM time,$FURL $DNS [$RESULT]"
+        logit "* $($DATE):retry $NUM time,$FURL $DNS [$RESULT]"
         change_dns
         sleep 5
       else
-        logit "* `$DATE`:retry $NUM time,$FURL $DNS [$RESULT]"
+        logit "* $($DATE):retry $NUM time,$FURL $DNS [$RESULT]"
         logit "* "
         logit "* retry $NUM times,no dns server could be reached"
         logit "* "
