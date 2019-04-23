@@ -13,7 +13,10 @@ source_dir="/root/mariadb-10.2.15"
 port=3308
 base_dir="/$base/app/mariadb"
 
-mkdir -p /$base/app/mariadb /$base/appData/mariadb /$base/logs/mariadb /$base/tmp/mariadb /$base/pid /$base/app/scripts
+for dir in /$base/app/mariadb /$base/appData/mariadb /$base/logs/mariadb /$base/tmp/mariadb /$base/pid /$base/app/scripts;do
+  [ ! -d $dir ] && mkdir -p $dir
+done
+
 chown -R mysql.mysql  /$base/app/mariadb /$base/appData/mariadb /$base/logs/mariadb /$base/tmp/mariadb
 chmod 777 /$base/pid
 [ ! -d $source_dir ] && tar xf /root/mariadb-10.2.15.tar.gz -C /root/
