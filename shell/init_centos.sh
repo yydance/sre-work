@@ -3,12 +3,12 @@
 # modified at : 2019-06-08 22:30
 
 os_version() {
-  os_ver=$(uname -r |cut -d. -f6)
+  os_ver=$(uname -r |grep -o 'el[0-9]')
 }
 
 os_version
 # install base packages, maybe you don't need
-yum -y install vim lsof sysstat wget iptraf openssl-clients gcc gcc-c++ ntp cmake gzip zip epel-release
+yum -y install vim lsof sysstat wget iptraf openssh-clients gcc gcc-c++ ntp cmake gzip zip epel-release
 yum clean all
 yum makecache
 
@@ -53,7 +53,7 @@ fi
 
 # set kernel
 if [ -f /etc/sysctl.conf.default -a -f /etc/sysctl.conf ];then
-mv /etc/sysct.conf /etc/sysctl.conf.$(date '+%Y%m%d%H%M%S')
+mv /etc/sysctl.conf /etc/sysctl.conf.$(date '+%Y%m%d%H%M%S')
 else
 mv /etc/{sysctl.conf,sysctl.conf.default}
 fi
