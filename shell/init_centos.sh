@@ -8,7 +8,7 @@ os_version() {
 
 os_version
 # install base packages, maybe you don't need
-yum -y install vim lsof sysstat wget iptraf openssh-clients gcc gcc-c++ ntp cmake gzip zip epel-release
+yum -y install vim lsof sysstat wget iptraf openssh-clients gcc gcc-c++ ntp cmake gzip zip epel-release bind-utils
 yum clean all
 yum makecache
 
