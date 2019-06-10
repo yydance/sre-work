@@ -9,8 +9,6 @@ os_version() {
 os_version
 # install base packages, maybe you don't need
 yum -y install vim lsof sysstat wget iptraf openssh-clients gcc gcc-c++ ntp cmake gzip zip epel-release bind-utils
-yum clean all
-yum makecache
 
 # set ntpdate
 ntpdate 0.centos.pool.ntp.org && hwclock -w
