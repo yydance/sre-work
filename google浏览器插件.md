@@ -6,3 +6,4 @@
 - JSon Handle, 格式化json
 - HTTP/2 and SPDY indicator, An indicator button for HTTP/2, SPDY and QUIC support by each website
 - 网页翻译，非插件，"设置" -> "高级" -> "语言"
+- Proxy SwitchySharp，梯子代理
