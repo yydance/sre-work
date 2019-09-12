@@ -7,3 +7,5 @@
 - HTTP/2 and SPDY indicator, An indicator button for HTTP/2, SPDY and QUIC support by each website
 - 网页翻译，非插件，"设置" -> "高级" -> "语言"
 - Proxy SwitchySharp，梯子代理
+- 沙拉划词
+- momentum，浏览器背景插件，重要的是自带`TODO`
