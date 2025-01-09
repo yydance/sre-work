@@ -1,0 +1,52 @@
+- hosts: elk_ols
+  become: yes
+  gather_facts: false
+
+  vars:
+    src_zk: ./zk
+    dst_zk: /data/apps/zk
+
+  tasks:
+  - name: make sure zookeeper destination exists
+    file:
+      path: "{{ dst_zk }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: synchronize zk files
+    synchronize:
+      src: "{{ src_zk }}/"
+      dest: "{{ dst_zk }}/"
+
+  - name: generate myid
+    shell: echo {{ inventory_hostname |regex_replace('[a-z]+\-[a-z]+(\d+)','\1') }} > {{ dst_zk }}/data/myid
+
+  - name: chown permission to root.root
+    file:
+      path: "{{ dst_zk }}"
+      owner: root
+      group: root
+      recurse: true
+
+  - name: add zookeeper.service to systemd
+    copy:
+      src: "{{ src_zk }}/zookeeper.service"
+      dest: /lib/systemd/system/zookeeper.service
+      owner: root
+      group: root
+      mode: 0644
+    register: zk_service
+
+  - name: reload systemd and add zookeeper auto-start
+    systemd:
+      daemon_reload: true
+      name: zookeeper
+      enabled: true
+    when: zk_service.failed == false
+
+  - name: install openjdk
+    yum:
+      name: java-1.8.0-openjdk
+      state: present
