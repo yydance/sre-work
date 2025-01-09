@@ -5,6 +5,7 @@
   vars:
     src_zk: ./zk
     dst_zk: /data/apps/zk
+    zk_id: "{{ inventory_hostname |regex_replace('[a-z]+-[a-z]+([0-9]+)','\\1') }}"
 
   tasks:
   - name: make sure zookeeper destination exists
@@ -21,7 +22,7 @@
       dest: "{{ dst_zk }}/"
 
   - name: generate myid
-    shell: echo {{ inventory_hostname |regex_replace('[a-z]+\-[a-z]+(\d+)','\1') }} > {{ dst_zk }}/data/myid
+    shell: echo {{ zk_id }} > {{ dst_zk }}/data/myid
 
   - name: chown permission to root.root
     file:
