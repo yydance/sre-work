@@ -1,0 +1,56 @@
+- hosts: elk_ols
+  become: yes
+  gather_facts: false
+
+  vars:
+    src_kafka: ./files/kafka
+    dst_kafka: /data/apps/kafka
+    broker_id: "{{ inventory_hostname |regex_replace('[a-z]+-[a-z]+([0-9]+)','\\1') }}"
+
+  tasks:
+  - name: make sure kafka destination exists
+    file:
+      path: "{{ dst_kafka }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: synchronize kafka files
+    synchronize:
+      src: "{{ src_kafka }}/"
+      dest: "{{ dst_kafka }}/"
+
+  - name: modify kafka broker id
+    lineinfile:
+      path: "{{ dst_kafka }}/config/server.properties"
+      regexp: '^broker.id'
+      line: broker.id={{ broker_id }}
+
+  - name: chown permission to root.root
+    file:
+      path: "{{ dst_kafka }}"
+      owner: root
+      group: root
+      recurse: true
+
+  - name: add kafka.service to systemd
+    copy:
+      src: "{{ src_kafka }}/kafka.service"
+      dest: /lib/systemd/system/kafka.service
+      owner: root
+      group: root
+      mode: 0644
+    register: kafka_service
+
+  - name: reload systemd and add kafka auto-start
+    systemd:
+      daemon_reload: true
+      name: kafka
+      enabled: true
+    when: kafka_service.failed == false
+
+  - name: install openjdk
+    yum:
+      name: java-1.8.0-openjdk
+      state: present
