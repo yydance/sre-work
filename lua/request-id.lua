@@ -1,3 +1,8 @@
+--[[
+获取腾讯、阿里、白山、阿卡麦默认cdn传递的uuid头，然后赋值给EEO-Request-ID
+如果获取不到，赋值nginx内置变量request-id，在自建cdn节点中记录此日志
+--]]
+
 local ngx = require "ngx"
 
 local _M = {}
